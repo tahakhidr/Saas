@@ -66,25 +66,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "saas.wsgi.application"
 
-DEVELOPMENT_MODE = config("DEVELOPMENT_MODE", cast=bool)
-
-if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-else:
+}
+
+DATABASE_URL = config("DATABASE_URL", cast=str)
+
+if DATABASE_URL is not None:
+    import dj_database_url
+
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT"),
-        }
+        "default": dj_database_url.config(
+            default=DATABASE_URL, conn_health_checks=True, conn_max_age=30
+        )
     }
 
 
